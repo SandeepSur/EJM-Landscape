@@ -110,5 +110,24 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // FAQ Accordion logic
+    const faqItems = document.querySelectorAll(".faq-item");
+    if (faqItems.length > 0) {
+        faqItems.forEach(item => {
+            const questionBtn = item.querySelector(".faq-question");
+            if (questionBtn) {
+                questionBtn.addEventListener("click", () => {
+                    const isOpen = item.classList.contains("active");
+                    // Close others for clean accordion feel
+                    faqItems.forEach(i => i.classList.remove("active"));
+                    if (!isOpen) {
+                        item.classList.add("active");
+                    }
+                });
+            }
+        });
+    }
+
 });
+
 
