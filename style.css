@@ -2298,22 +2298,84 @@ body.hero-loaded .customer-rating {
     align-items: center;
 }
 
+.gardening-hero-card {
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+}
+
+.gardening-hero-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 35px rgba(0, 0, 0, 0.06);
+}
+
+.gardening-hero-img-wrap img {
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.gardening-hero-img-wrap:hover img {
+    transform: scale(1.04);
+}
+
+.experience-card {
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+}
+
+.experience-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 35px rgba(0, 0, 0, 0.05);
+}
+
+.experience-img-wrap img {
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.experience-img-wrap:hover img {
+    transform: scale(1.04);
+}
+
+.more-service-item {
+    padding: 12px;
+    border-radius: 16px;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease;
+}
+
+.more-service-item:hover {
+    transform: translateY(-6px);
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.faq-item {
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.faq-item:hover {
+    transform: translateX(4px);
+    border-color: #a6b835;
+}
+
 .faq-testimonial-wrap img {
     width: 100%;
-    max-width: 480px;
+    max-width: 440px;
     height: auto;
     display: block;
     border-radius: 36px;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.06);
-    transition: transform 0.3s ease;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.07);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
 }
 
 .faq-testimonial-wrap:hover img {
-    transform: translateY(-4px);
+    transform: translateY(-6px) scale(1.015);
+    box-shadow: 0 22px 50px rgba(0, 0, 0, 0.12);
 }
 
-/* RESPONSIVE ADDITIONS */
+/* RESPONSIVE ADDITIONS FOR GARDERING PAGE */
 @media (max-width: 1024px) {
+    .gardening-hero-container {
+        padding: 20px;
+    }
+    .gardening-hero-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
     .more-services-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 30px;
@@ -2326,51 +2388,108 @@ body.hero-loaded .customer-rating {
         grid-template-columns: 1fr;
         gap: 50px;
     }
+    .faq-testimonial-wrap {
+        margin-top: 10px;
+    }
     .faq-testimonial-wrap img {
-        max-width: 420px;
+        max-width: 380px;
     }
 }
 
 @media (max-width: 768px) {
+    .gardening-hero-container {
+        padding: 15px;
+    }
+    .gardening-hero-card {
+        padding: 35px 22px;
+        border-radius: 22px;
+    }
+    .gardening-hero-card h1 {
+        font-size: 38px;
+        line-height: 1.15;
+    }
+    .gardening-hero-img-wrap {
+        border-radius: 22px;
+        min-height: 280px;
+        max-height: 380px;
+    }
+
+    .gardening-tabs-section {
+        padding: 50px 15px;
+    }
+    .tabs-header-left h2 {
+        font-size: 32px;
+    }
+    .services-tab-nav {
+        gap: 0;
+        margin-bottom: 30px;
+        padding-bottom: 8px;
+        -webkit-overflow-scrolling: touch;
+    }
+    .tab-btn {
+        padding: 10px 16px 12px 0;
+        margin-right: 18px;
+        font-size: 14.5px;
+    }
+
     .more-services-wrapper {
-        padding: 40px 15px 60px;
+        padding: 35px 15px 55px;
+    }
+    .leaf-crown-container img {
+        height: 48px;
+        margin-bottom: -4px;
     }
     .more-services-card {
-        padding: 45px 25px;
-        border-radius: 24px;
+        padding: 40px 20px 45px;
+        border-radius: 22px;
     }
     .more-services-header h2 {
-        font-size: 30px;
+        font-size: 26px;
+        line-height: 1.25;
     }
     .more-services-grid {
         grid-template-columns: 1fr;
         gap: 25px;
     }
+
     .experience-section {
-        padding: 40px 15px 60px;
+        padding: 40px 15px 55px;
     }
     .experience-card {
-        padding: 35px 25px;
-        border-radius: 24px;
+        padding: 32px 20px;
+        border-radius: 22px;
     }
     .experience-card h2 {
-        font-size: 32px;
+        font-size: 30px;
+        line-height: 1.2;
     }
+    .experience-img-wrap {
+        border-radius: 22px;
+        min-height: 280px;
+        max-height: 380px;
+    }
+
     .faq-section {
         padding: 40px 15px 60px;
     }
     .faq-left h2 {
-        font-size: 32px;
+        font-size: 30px;
+        margin-bottom: 25px;
     }
     .faq-question {
         font-size: 15px;
-        padding: 16px 20px;
+        padding: 16px 18px;
+        min-height: 52px;
+    }
+    .faq-testimonial-wrap {
+        margin-top: 20px;
     }
     .faq-testimonial-wrap img {
         width: 100%;
-        max-width: 100%;
+        max-width: 330px;
         border-radius: 24px;
     }
 }
+
 
 
