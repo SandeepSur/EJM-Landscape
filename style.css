@@ -1632,3 +1632,324 @@ body.hero-loaded .customer-rating {
         text-align: center;
     }
 }
+
+/* ===================================================
+   GARDERING PAGE STYLES
+   =================================================== */
+
+.gardening-hero-container {
+    padding: 20px 40px 40px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.gardening-hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.05fr;
+    gap: 30px;
+    align-items: stretch;
+}
+
+.gardening-hero-card {
+    background-color: #b9baaF;
+    border-radius: 28px;
+    padding: 55px 50px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.gardening-corner-icon {
+    position: absolute;
+    top: 35px;
+    right: 35px;
+    opacity: 0.85;
+}
+
+.gardening-hero-card .service-badge {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--dark-green);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    display: inline-block;
+    margin-bottom: 20px;
+}
+
+.gardening-hero-card h1 {
+    font-size: 58px;
+    line-height: 1.1;
+    color: var(--dark-green);
+    font-weight: 600;
+    letter-spacing: -1px;
+    margin-bottom: 25px;
+}
+
+.gardening-hero-card p {
+    font-size: 16px;
+    line-height: 1.65;
+    color: #243d32;
+    margin-bottom: 35px;
+    max-width: 520px;
+}
+
+.gardening-hero-card .btn-quote {
+    align-self: flex-start;
+    background-color: var(--dark-green);
+    color: var(--text-light);
+    padding: 14px 28px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 15px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.gardening-hero-card .btn-quote:hover {
+    background-color: var(--dark-green-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(17, 60, 39, 0.2);
+}
+
+.gardening-hero-img-wrap {
+    border-radius: 28px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+}
+
+.gardening-hero-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    min-height: 420px;
+}
+
+/* TABS SECTION */
+.gardening-tabs-section {
+    padding: 80px 40px 100px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.gardening-tabs-header {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr;
+    gap: 50px;
+    align-items: flex-start;
+    margin-bottom: 60px;
+}
+
+.tabs-header-left .section-subtitle {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--dark-green);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: block;
+}
+
+.tabs-header-left h2 {
+    font-size: 46px;
+    line-height: 1.15;
+    color: var(--dark-green);
+    font-weight: 600;
+    letter-spacing: -0.8px;
+}
+
+.tabs-header-right p {
+    font-size: 15.5px;
+    line-height: 1.7;
+    color: #4a5850;
+}
+
+/* TAB NAVIGATION */
+.services-tab-nav {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid #d2d5cc;
+    margin-bottom: 50px;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.services-tab-nav::-webkit-scrollbar {
+    display: none;
+}
+
+.tab-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 16px 28px 18px 0;
+    margin-right: 35px;
+    font-family: var(--font-main);
+    font-size: 16px;
+    font-weight: 500;
+    color: #425247;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    white-space: nowrap;
+    position: relative;
+}
+
+.tab-btn .tab-flower-icon {
+    width: 20px;
+    height: 20px;
+    color: #a2b72f;
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
+}
+
+.tab-btn:hover {
+    color: var(--dark-green);
+}
+
+.tab-btn:hover .tab-flower-icon {
+    transform: rotate(45deg);
+}
+
+.tab-btn.active {
+    color: var(--dark-green);
+    font-weight: 600;
+    border-bottom: 2px solid #5a665e;
+}
+
+/* TAB CONTENT PANELS */
+.tab-panel {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+}
+
+.tab-panel.active {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 80px;
+    align-items: flex-start;
+    animation: fadeInTab 0.4s ease forwards;
+}
+
+@keyframes fadeInTab {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.tab-info-col p {
+    font-size: 16px;
+    line-height: 1.7;
+    color: #3b4a41;
+    margin-bottom: 35px;
+    max-width: 480px;
+}
+
+.tab-info-col .btn-quote {
+    display: inline-block;
+    background-color: var(--dark-green);
+    color: var(--text-light);
+    padding: 13px 28px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 15px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.tab-info-col .btn-quote:hover {
+    background-color: var(--dark-green-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(17, 60, 39, 0.2);
+}
+
+.tab-features-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.tab-feature-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.tab-feature-badge {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background-color: #a2b72f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(162, 183, 47, 0.25);
+}
+
+.tab-feature-badge svg {
+    width: 18px;
+    height: 18px;
+    color: var(--dark-green);
+}
+
+.tab-feature-text {
+    font-size: 16px;
+    color: #1e352f;
+    font-weight: 500;
+}
+
+/* RESPONSIVE FOR GARDERING PAGE */
+@media (max-width: 1024px) {
+    .gardening-hero-grid {
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
+    .gardening-tabs-header {
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
+    .tab-panel.active {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+}
+
+@media (max-width: 768px) {
+    .gardening-hero-container {
+        padding: 15px;
+    }
+    .gardening-hero-card {
+        padding: 35px 25px;
+    }
+    .gardening-hero-card h1 {
+        font-size: 40px;
+    }
+    .gardening-tabs-section {
+        padding: 60px 20px;
+    }
+    .tabs-header-left h2 {
+        font-size: 34px;
+    }
+    .services-tab-nav {
+        gap: 0;
+        margin-bottom: 35px;
+    }
+    .tab-btn {
+        padding: 12px 18px 14px 0;
+        margin-right: 20px;
+        font-size: 14.5px;
+    }
+}
+

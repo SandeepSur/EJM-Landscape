@@ -89,4 +89,26 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // Tab switching logic for Gardering page
+    const tabBtns = document.querySelectorAll(".tab-btn");
+    const tabPanels = document.querySelectorAll(".tab-panel");
+
+    if (tabBtns.length > 0 && tabPanels.length > 0) {
+        tabBtns.forEach(btn => {
+            btn.addEventListener("click", () => {
+                const targetId = btn.getAttribute("data-tab");
+
+                tabBtns.forEach(b => b.classList.remove("active"));
+                tabPanels.forEach(p => p.classList.remove("active"));
+
+                btn.classList.add("active");
+                const targetPanel = document.getElementById(targetId);
+                if (targetPanel) {
+                    targetPanel.classList.add("active");
+                }
+            });
+        });
+    }
+
 });
+
