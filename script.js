@@ -61,6 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const scale = 1 + scrollPosition * 0.0005;
         
         // Apply the transformation to hero background
+        // Legacy hero background translation replaced by scroll-scrubbed frame sequence hero
         if (heroBg) {
             heroBg.style.transform = `translateY(${yPos}px) scale(${scale})`;
         }
@@ -90,6 +91,199 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     revealElements.forEach(el => revealObserver.observe(el));
+
+    // =========================================================================
+    // SCROLL-SCRUBBED FRAME ANIMATION HERO
+    // =========================================================================
+    const heroContainer = document.getElementById("hero-scroll-container");
+    const heroCanvas = document.getElementById("hero-canvas");
+
+    if (heroContainer && heroCanvas) {
+        const ctx = heroCanvas.getContext("2d", { alpha: false });
+        const loader = document.getElementById("hero-loader");
+        const loaderPct = document.getElementById("hero-loader-pct");
+        const contentStart = document.getElementById("hero-content-start");
+        const contentEnd = document.getElementById("hero-content-end");
+        const scrollHint = document.getElementById("hero-scroll-hint");
+
+        const BASE_DIR = "assets/hero-section-frames/hero_section_frames/";
+        let totalFrames = 141;
+        let getFramePath = (i) => `${BASE_DIR}ezgif-frame-${String(i + 1).padStart(3, '0')}.jpg`;
+        const frames = [];
+        let currentFrameIndex = 0;
+        let isDrawing = false;
+
+        function resizeCanvas() {
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            const w = heroCanvas.clientWidth;
+            const h = heroCanvas.clientHeight;
+            if (w && h) {
+                const targetW = Math.round(w * dpr);
+                const targetH = Math.round(h * dpr);
+                if (heroCanvas.width !== targetW || heroCanvas.height !== targetH) {
+                    heroCanvas.width = targetW;
+                    heroCanvas.height = targetH;
+                }
+                drawFrame(currentFrameIndex);
+            }
+        }
+
+        function drawFrame(index) {
+            let img = frames[index];
+            // If target frame is not yet ready, fallback to nearest available frame
+            if (!img || !img.complete || !img.naturalWidth) {
+                for (let offset = 1; offset < totalFrames; offset++) {
+                    if (index - offset >= 0 && frames[index - offset] && frames[index - offset].complete) {
+                        img = frames[index - offset];
+                        break;
+                    }
+                    if (index + offset < totalFrames && frames[index + offset] && frames[index + offset].complete) {
+                        img = frames[index + offset];
+                        break;
+                    }
+                }
+            }
+
+            if (!img || !img.complete || !img.naturalWidth) return;
+
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            const w = heroCanvas.clientWidth;
+            const h = heroCanvas.clientHeight;
+
+            ctx.save();
+            ctx.scale(dpr, dpr);
+
+            // Cover draw (like object-fit: cover)
+            const imgRatio = img.naturalWidth / img.naturalHeight;
+            const canvasRatio = w / h;
+            let dw, dh, dx, dy;
+
+            if (canvasRatio > imgRatio) {
+                dw = w;
+                dh = w / imgRatio;
+                dx = 0;
+                dy = (h - dh) / 2;
+            } else {
+                dh = h;
+                dw = h * imgRatio;
+                dx = (w - dw) / 2;
+                dy = 0;
+            }
+
+            ctx.drawImage(img, dx, dy, dw, dh);
+            ctx.restore();
+        }
+
+        function onHeroScroll() {
+            const rect = heroContainer.getBoundingClientRect();
+            const scrollDistance = rect.height - window.innerHeight;
+            if (scrollDistance <= 0) return;
+
+            const scrolled = -rect.top;
+            const progress = Math.min(Math.max(scrolled / scrollDistance, 0), 1);
+
+            const targetIndex = Math.min(Math.floor(progress * totalFrames), totalFrames - 1);
+            if (targetIndex !== currentFrameIndex) {
+                currentFrameIndex = targetIndex;
+                drawFrame(currentFrameIndex);
+            }
+
+            // Start headline/CTA fade-out
+            if (contentStart) {
+                const startOpacity = Math.max(0, 1 - (progress / 0.18));
+                contentStart.style.opacity = startOpacity;
+                contentStart.style.transform = `translateY(calc(-50% - ${progress * 50}px))`;
+                contentStart.style.pointerEvents = startOpacity < 0.1 ? "none" : "auto";
+            }
+
+            // Scroll hint fade-out
+            if (scrollHint) {
+                const hintOpacity = Math.max(0, 1 - (progress / 0.07));
+                scrollHint.style.opacity = hintOpacity;
+                scrollHint.style.pointerEvents = hintOpacity < 0.1 ? "none" : "auto";
+            }
+
+            // End headline/CTA fade-in
+            if (contentEnd) {
+                const endOpacity = Math.min(1, Math.max(0, (progress - 0.82) / 0.16));
+                contentEnd.style.opacity = endOpacity;
+                contentEnd.style.transform = `translateY(calc(-50% + ${(1 - endOpacity) * 20}px))`;
+                contentEnd.style.pointerEvents = endOpacity < 0.1 ? "none" : "auto";
+            }
+
+            isDrawing = false;
+        }
+
+        window.addEventListener("scroll", () => {
+            if (!isDrawing) {
+                window.requestAnimationFrame(onHeroScroll);
+                isDrawing = true;
+            }
+        }, { passive: true });
+
+        window.addEventListener("resize", () => {
+            resizeCanvas();
+        }, { passive: true });
+
+        function beginPreloading() {
+            let loadedCount = 0;
+
+            function onFrameLoaded(i, img) {
+                frames[i] = img;
+                loadedCount++;
+
+                if (i === 0) {
+                    resizeCanvas();
+                }
+
+                if (loaderPct) {
+                    const pct = Math.round((loadedCount / totalFrames) * 100);
+                    loaderPct.textContent = `${pct}%`;
+                }
+
+                if (loadedCount >= totalFrames) {
+                    if (loader) loader.classList.add("is-hidden");
+                }
+            }
+
+            for (let i = 0; i < totalFrames; i++) {
+                const img = new Image();
+                img.src = getFramePath(i);
+                img.onload = () => onFrameLoaded(i, img);
+                img.onerror = () => {
+                    loadedCount++;
+                    if (loadedCount >= totalFrames && loader) {
+                        loader.classList.add("is-hidden");
+                    }
+                };
+            }
+        }
+
+        // Probe for ezgif-frame-001.jpg vs egzif-frame-0.jpg
+        const probe1 = new Image();
+        probe1.src = `${BASE_DIR}ezgif-frame-001.jpg`;
+        probe1.onload = () => {
+            totalFrames = 141;
+            getFramePath = (i) => `${BASE_DIR}ezgif-frame-${String(i + 1).padStart(3, '0')}.jpg`;
+            beginPreloading();
+        };
+        probe1.onerror = () => {
+            const probe2 = new Image();
+            probe2.src = `${BASE_DIR}egzif-frame-0.jpg`;
+            probe2.onload = () => {
+                totalFrames = 142;
+                getFramePath = (i) => `${BASE_DIR}egzif-frame-${i}.jpg`;
+                beginPreloading();
+            };
+            probe2.onerror = () => {
+                totalFrames = 142;
+                getFramePath = (i) => `${BASE_DIR}ezgif-frame-${i}.jpg`;
+                beginPreloading();
+            };
+        };
+
+        resizeCanvas();
+    }
 
     // Carousel logic
     const track = document.getElementById("carousel-track");

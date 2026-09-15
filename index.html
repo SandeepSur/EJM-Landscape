@@ -47,10 +47,14 @@
     </header>
 
     <main>
-        <section class="hero-container">
-            <div class="hero-image-wrapper">
-                <div class="hero-bg" id="hero-bg"></div>
-                <div class="hero-content">
+        <!-- SCROLL-SCRUBBED FRAME-SEQUENCE HERO SECTION -->
+        <section class="hero-scroll-container" id="hero-scroll-container">
+            <div class="hero-sticky-frame">
+                <canvas id="hero-canvas" class="hero-canvas"></canvas>
+                <div class="hero-canvas-overlay"></div>
+
+                <!-- Initial Hero Content (Fades out on scroll) -->
+                <div class="hero-content hero-content-start" id="hero-content-start">
                     <h1>
                         We Bring Your<br>
                         Garden <span class="highlight">to Life
@@ -61,11 +65,40 @@
                         </span>
                     </h1>
                     <div class="hero-buttons">
-                        <a href="#" class="btn btn-lime">Explore Projects</a>
-                        <a href="#" class="btn btn-dark-transparent">Request a Quote</a>
+                        <a href="#projects" class="btn btn-lime">Explore Projects</a>
+                        <a href="#contact" class="btn btn-dark-transparent">Request a Quote</a>
                     </div>
                 </div>
-                <div class="customer-rating">
+
+                <!-- Transformed Hero Content (Fades in at end of transformation) -->
+                <div class="hero-content hero-content-end" id="hero-content-end">
+                    <span class="hero-transform-badge">Transformation Complete</span>
+                    <h1>
+                        Your Dream Garden,<br>
+                        <span class="highlight">Brought to Life
+                            <svg class="underline" viewBox="0 0 240 20" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M5 10 Q 60 5, 120 12 T 235 15" stroke="#a6b835" stroke-width="6" fill="transparent" stroke-linecap="round"/>
+                                <path d="M15 18 Q 80 15, 150 16 T 225 18" stroke="#a6b835" stroke-width="4" fill="transparent" stroke-linecap="round"/>
+                            </svg>
+                        </span>
+                    </h1>
+                    <div class="hero-buttons">
+                        <a href="#contact" class="btn btn-lime">Get Your Transformation</a>
+                        <a href="#projects" class="btn btn-dark-transparent">Explore Our Work</a>
+                    </div>
+                </div>
+
+                <!-- Interactive Scroll Hint -->
+                <div class="hero-scroll-indicator" id="hero-scroll-hint">
+                    <span>Scroll to Transform</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <polyline points="19 12 12 19 5 12"></polyline>
+                    </svg>
+                </div>
+
+                <!-- Customer Rating Badge -->
+                <div class="customer-rating" id="hero-rating">
                     <div class="rating-badge">
                         <div class="rating-flower">
                             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -75,6 +108,12 @@
                         </div>
                         <span class="rating-text">Customer Rating</span>
                     </div>
+                </div>
+
+                <!-- Lightweight Preload State -->
+                <div class="hero-loader" id="hero-loader">
+                    <div class="hero-loader-spinner"></div>
+                    <div class="hero-loader-text">Loading Experience <span id="hero-loader-pct">0%</span></div>
                 </div>
             </div>
         </section>
