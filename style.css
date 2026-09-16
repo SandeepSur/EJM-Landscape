@@ -129,17 +129,16 @@ body {
 }
 
 
-/* HERO SECTION (SCROLL-SCRUBBED FRAME ANIMATION) */
-.hero-scroll-container {
+/* HERO SECTION (GSAP SCROLLTRIGGER PIN/SCRUB FRAME ANIMATION) */
+.hero-scroll-section {
     position: relative;
-    height: 500vh;
+    width: 100%;
     background-color: #0b1a13;
+    overflow: hidden;
 }
 
-.hero-sticky-frame {
-    position: sticky;
-    top: 0;
-    left: 0;
+.hero-pin-wrapper {
+    position: relative;
     width: 100%;
     height: 100vh;
     height: 100dvh;
@@ -147,6 +146,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    background-color: #0b1a13;
 }
 
 .hero-canvas {
@@ -1685,9 +1685,6 @@ button:active {
     /* Global Section Padding */
     .about-section, .services-section, .why-section, .projects-section, .contact-section, .google-reviews-section {
         padding: 55px 20px;
-    }
-    .hero-scroll-container {
-        height: 420vh;
     }
     .hero-scroll-indicator {
         bottom: 85px;

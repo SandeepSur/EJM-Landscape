@@ -93,12 +93,16 @@ document.addEventListener("DOMContentLoaded", () => {
     revealElements.forEach(el => revealObserver.observe(el));
 
     // =========================================================================
-    // SCROLL-SCRUBBED FRAME ANIMATION HERO
+    // GSAP + SCROLLTRIGGER SCROLL-SCRUBBED FRAME ANIMATION HERO
     // =========================================================================
-    const heroContainer = document.getElementById("hero-scroll-container");
+    const heroSection = document.getElementById("hero-scroll-section");
     const heroCanvas = document.getElementById("hero-canvas");
 
-    if (heroContainer && heroCanvas) {
+    if (heroSection && heroCanvas) {
+        if (window.gsap && window.ScrollTrigger) {
+            gsap.registerPlugin(ScrollTrigger);
+        }
+
         const ctx = heroCanvas.getContext("2d", { alpha: false });
         const loader = document.getElementById("hero-loader");
         const loaderPct = document.getElementById("hero-loader-pct");
@@ -110,28 +114,53 @@ document.addEventListener("DOMContentLoaded", () => {
         let totalFrames = 141;
         let getFramePath = (i) => `${BASE_DIR}ezgif-frame-${String(i + 1).padStart(3, '0')}.jpg`;
         const frames = [];
-        let currentFrameIndex = 0;
-        let isDrawing = false;
+        let activeFrameIndex = 0;
+        let lastDrawnIndex = -1;
+        let rafPending = false;
 
-        function resizeCanvas() {
-            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        let drawX = 0, drawY = 0, drawW = 0, drawH = 0;
+
+        // Precalculate canvas dimensions and cover coordinates on resize
+        function updateCanvasSize() {
             const w = heroCanvas.clientWidth;
             const h = heroCanvas.clientHeight;
-            if (w && h) {
-                const targetW = Math.round(w * dpr);
-                const targetH = Math.round(h * dpr);
-                if (heroCanvas.width !== targetW || heroCanvas.height !== targetH) {
-                    heroCanvas.width = targetW;
-                    heroCanvas.height = targetH;
-                }
-                drawFrame(currentFrameIndex);
+            if (!w || !h) return;
+
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            const targetW = Math.round(w * dpr);
+            const targetH = Math.round(h * dpr);
+
+            if (heroCanvas.width !== targetW || heroCanvas.height !== targetH) {
+                heroCanvas.width = targetW;
+                heroCanvas.height = targetH;
             }
+
+            const imgAspect = 1280 / 720;
+            const canvasAspect = targetW / targetH;
+
+            if (canvasAspect > imgAspect) {
+                drawW = targetW;
+                drawH = Math.round(targetW / imgAspect);
+                drawX = 0;
+                drawY = Math.round((targetH - drawH) / 2);
+            } else {
+                drawH = targetH;
+                drawW = Math.round(targetH * imgAspect);
+                drawX = Math.round((targetW - drawW) / 2);
+                drawY = 0;
+            }
+
+            lastDrawnIndex = -1;
+            renderFrame(activeFrameIndex);
         }
 
-        function drawFrame(index) {
+        // Blit frame to canvas only when the frame index changes
+        function renderFrame(index) {
+            if (index === lastDrawnIndex) return;
+
             let img = frames[index];
-            // If target frame is not yet ready, fallback to nearest available frame
             if (!img || !img.complete || !img.naturalWidth) {
+                // Nearest-available frame fallback during initial preload
                 for (let offset = 1; offset < totalFrames; offset++) {
                     if (index - offset >= 0 && frames[index - offset] && frames[index - offset].complete) {
                         img = frames[index - offset];
@@ -146,117 +175,113 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (!img || !img.complete || !img.naturalWidth) return;
 
-            const dpr = Math.min(window.devicePixelRatio || 1, 2);
-            const w = heroCanvas.clientWidth;
-            const h = heroCanvas.clientHeight;
-
-            ctx.save();
-            ctx.scale(dpr, dpr);
-
-            // Cover draw (like object-fit: cover)
-            const imgRatio = img.naturalWidth / img.naturalHeight;
-            const canvasRatio = w / h;
-            let dw, dh, dx, dy;
-
-            if (canvasRatio > imgRatio) {
-                dw = w;
-                dh = w / imgRatio;
-                dx = 0;
-                dy = (h - dh) / 2;
-            } else {
-                dh = h;
-                dw = h * imgRatio;
-                dx = (w - dw) / 2;
-                dy = 0;
-            }
-
-            ctx.drawImage(img, dx, dy, dw, dh);
-            ctx.restore();
+            ctx.drawImage(img, drawX, drawY, drawW, drawH);
+            lastDrawnIndex = index;
         }
 
-        function onHeroScroll() {
-            const rect = heroContainer.getBoundingClientRect();
-            const scrollDistance = rect.height - window.innerHeight;
-            if (scrollDistance <= 0) return;
-
-            const scrolled = -rect.top;
-            const progress = Math.min(Math.max(scrolled / scrollDistance, 0), 1);
-
-            const targetIndex = Math.min(Math.floor(progress * totalFrames), totalFrames - 1);
-            if (targetIndex !== currentFrameIndex) {
-                currentFrameIndex = targetIndex;
-                drawFrame(currentFrameIndex);
-            }
-
-            // Start headline/CTA fade-out
+        function updateOverlayText(progress) {
+            // 0 -> 0.18: Start content fades out
             if (contentStart) {
                 const startOpacity = Math.max(0, 1 - (progress / 0.18));
                 contentStart.style.opacity = startOpacity;
-                contentStart.style.transform = `translateY(calc(-50% - ${progress * 50}px))`;
+                contentStart.style.transform = `translateY(calc(-50% - ${progress * 40}px))`;
                 contentStart.style.pointerEvents = startOpacity < 0.1 ? "none" : "auto";
             }
 
-            // Scroll hint fade-out
+            // Scroll hint fades out early (by 0.06)
             if (scrollHint) {
-                const hintOpacity = Math.max(0, 1 - (progress / 0.07));
+                const hintOpacity = Math.max(0, 1 - (progress / 0.06));
                 scrollHint.style.opacity = hintOpacity;
                 scrollHint.style.pointerEvents = hintOpacity < 0.1 ? "none" : "auto";
             }
 
-            // End headline/CTA fade-in
+            // 0.82 -> 1.0: Transformed completion content fades in
             if (contentEnd) {
                 const endOpacity = Math.min(1, Math.max(0, (progress - 0.82) / 0.16));
                 contentEnd.style.opacity = endOpacity;
                 contentEnd.style.transform = `translateY(calc(-50% + ${(1 - endOpacity) * 20}px))`;
                 contentEnd.style.pointerEvents = endOpacity < 0.1 ? "none" : "auto";
             }
-
-            isDrawing = false;
         }
 
-        window.addEventListener("scroll", () => {
-            if (!isDrawing) {
-                window.requestAnimationFrame(onHeroScroll);
-                isDrawing = true;
-            }
-        }, { passive: true });
+        // Initialize ScrollTrigger with pin: true and scrub
+        function initScrollTrigger() {
+            if (!window.ScrollTrigger) return;
 
-        window.addEventListener("resize", () => {
-            resizeCanvas();
-        }, { passive: true });
+            const isMobile = window.innerWidth <= 768;
+            const scrollDist = isMobile ? "+=2200" : "+=3400";
 
-        function beginPreloading() {
-            let loadedCount = 0;
+            ScrollTrigger.create({
+                trigger: "#hero-scroll-section",
+                start: "top top",
+                end: scrollDist,
+                pin: true,
+                pinSpacing: true,
+                scrub: 0.8,
+                anticipatePin: 1,
+                onUpdate: (self) => {
+                    const progress = self.progress;
+                    const targetIndex = Math.min(Math.floor(progress * totalFrames), totalFrames - 1);
 
-            function onFrameLoaded(i, img) {
-                frames[i] = img;
-                loadedCount++;
-
-                if (i === 0) {
-                    resizeCanvas();
-                }
-
-                if (loaderPct) {
-                    const pct = Math.round((loadedCount / totalFrames) * 100);
-                    loaderPct.textContent = `${pct}%`;
-                }
-
-                if (loadedCount >= totalFrames) {
-                    if (loader) loader.classList.add("is-hidden");
-                }
-            }
-
-            for (let i = 0; i < totalFrames; i++) {
-                const img = new Image();
-                img.src = getFramePath(i);
-                img.onload = () => onFrameLoaded(i, img);
-                img.onerror = () => {
-                    loadedCount++;
-                    if (loadedCount >= totalFrames && loader) {
-                        loader.classList.add("is-hidden");
+                    if (targetIndex !== activeFrameIndex) {
+                        activeFrameIndex = targetIndex;
+                        if (!rafPending) {
+                            rafPending = true;
+                            requestAnimationFrame(() => {
+                                renderFrame(activeFrameIndex);
+                                rafPending = false;
+                            });
+                        }
                     }
-                };
+
+                    updateOverlayText(progress);
+                }
+            });
+        }
+
+        // Batch preloading to avoid network congestion and UI jank
+        function startPreloading() {
+            let loadedCount = 1; // frame 0 is already loaded
+
+            function onPreloadDone() {
+                if (loader) loader.classList.add("is-hidden");
+                if (window.ScrollTrigger) {
+                    ScrollTrigger.refresh();
+                }
             }
+
+            const BATCH_SIZE = 8;
+            let nextIndex = 1;
+
+            function loadNextBatch() {
+                while (nextIndex < totalFrames && (nextIndex - loadedCount) < BATCH_SIZE) {
+                    const idx = nextIndex++;
+                    const img = new Image();
+                    img.onload = () => {
+                        frames[idx] = img;
+                        loadedCount++;
+                        if (loaderPct) {
+                            loaderPct.textContent = `${Math.round((loadedCount / totalFrames) * 100)}%`;
+                        }
+                        if (loadedCount >= totalFrames) {
+                            onPreloadDone();
+                        } else {
+                            loadNextBatch();
+                        }
+                    };
+                    img.onerror = () => {
+                        loadedCount++;
+                        if (loadedCount >= totalFrames) {
+                            onPreloadDone();
+                        } else {
+                            loadNextBatch();
+                        }
+                    };
+                    img.src = getFramePath(idx);
+                }
+            }
+
+            loadNextBatch();
         }
 
         // Probe for ezgif-frame-001.jpg vs egzif-frame-0.jpg
@@ -265,7 +290,10 @@ document.addEventListener("DOMContentLoaded", () => {
         probe1.onload = () => {
             totalFrames = 141;
             getFramePath = (i) => `${BASE_DIR}ezgif-frame-${String(i + 1).padStart(3, '0')}.jpg`;
-            beginPreloading();
+            frames[0] = probe1;
+            updateCanvasSize();
+            initScrollTrigger();
+            startPreloading();
         };
         probe1.onerror = () => {
             const probe2 = new Image();
@@ -273,16 +301,25 @@ document.addEventListener("DOMContentLoaded", () => {
             probe2.onload = () => {
                 totalFrames = 142;
                 getFramePath = (i) => `${BASE_DIR}egzif-frame-${i}.jpg`;
-                beginPreloading();
+                frames[0] = probe2;
+                updateCanvasSize();
+                initScrollTrigger();
+                startPreloading();
             };
             probe2.onerror = () => {
                 totalFrames = 142;
                 getFramePath = (i) => `${BASE_DIR}ezgif-frame-${i}.jpg`;
-                beginPreloading();
+                initScrollTrigger();
+                startPreloading();
             };
         };
 
-        resizeCanvas();
+        window.addEventListener("resize", () => {
+            updateCanvasSize();
+            if (window.ScrollTrigger) {
+                ScrollTrigger.refresh();
+            }
+        }, { passive: true });
     }
 
     // Carousel logic
