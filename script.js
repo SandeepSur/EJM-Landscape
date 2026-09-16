@@ -204,23 +204,26 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
-        // Initialize ScrollTrigger with pin: true and scrub
+        let heroScrollTrigger = null;
+
+        // Initialize ScrollTrigger with pinSpacing: false and smooth scrub: 1.2
         function initScrollTrigger() {
             if (!window.ScrollTrigger) return;
+            if (heroScrollTrigger) {
+                heroScrollTrigger.kill();
+            }
 
-            const isMobile = window.innerWidth <= 768;
-            const scrollDist = isMobile ? "+=2200" : "+=3400";
-
-            ScrollTrigger.create({
+            heroScrollTrigger = ScrollTrigger.create({
                 trigger: "#hero-scroll-section",
                 start: "top top",
-                end: scrollDist,
-                pin: true,
-                pinSpacing: true,
-                scrub: 0.8,
+                end: "bottom bottom",
+                pin: "#hero-pin-wrapper",
+                pinSpacing: false,
+                scrub: 1.2,
                 anticipatePin: 1,
+                invalidateOnRefresh: true,
                 onUpdate: (self) => {
-                    const progress = self.progress;
+                    const progress = Math.min(Math.max(self.progress, 0), 1);
                     const targetIndex = Math.min(Math.floor(progress * totalFrames), totalFrames - 1);
 
                     if (targetIndex !== activeFrameIndex) {
@@ -239,25 +242,32 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
 
-        // Batch preloading to avoid network congestion and UI jank
+        // Full preloading of all frames before enabling interaction
         function startPreloading() {
             let loadedCount = 1; // frame 0 is already loaded
 
             function onPreloadDone() {
-                if (loader) loader.classList.add("is-hidden");
+                if (loader) {
+                    loader.classList.add("is-hidden");
+                    setTimeout(() => {
+                        loader.style.display = "none";
+                    }, 400);
+                }
+                initScrollTrigger();
                 if (window.ScrollTrigger) {
                     ScrollTrigger.refresh();
                 }
             }
 
-            const BATCH_SIZE = 8;
+            const BATCH_SIZE = 12;
             let nextIndex = 1;
 
             function loadNextBatch() {
                 while (nextIndex < totalFrames && (nextIndex - loadedCount) < BATCH_SIZE) {
                     const idx = nextIndex++;
                     const img = new Image();
-                    img.onload = () => {
+
+                    const handleLoaded = () => {
                         frames[idx] = img;
                         loadedCount++;
                         if (loaderPct) {
@@ -269,6 +279,15 @@ document.addEventListener("DOMContentLoaded", () => {
                             loadNextBatch();
                         }
                     };
+
+                    img.onload = () => {
+                        if (typeof img.decode === "function") {
+                            img.decode().then(handleLoaded).catch(handleLoaded);
+                        } else {
+                            handleLoaded();
+                        }
+                    };
+
                     img.onerror = () => {
                         loadedCount++;
                         if (loadedCount >= totalFrames) {
@@ -277,6 +296,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             loadNextBatch();
                         }
                     };
+
                     img.src = getFramePath(idx);
                 }
             }
@@ -292,7 +312,7 @@ document.addEventListener("DOMContentLoaded", () => {
             getFramePath = (i) => `${BASE_DIR}ezgif-frame-${String(i + 1).padStart(3, '0')}.jpg`;
             frames[0] = probe1;
             updateCanvasSize();
-            initScrollTrigger();
+            renderFrame(0);
             startPreloading();
         };
         probe1.onerror = () => {
@@ -303,13 +323,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 getFramePath = (i) => `${BASE_DIR}egzif-frame-${i}.jpg`;
                 frames[0] = probe2;
                 updateCanvasSize();
-                initScrollTrigger();
+                renderFrame(0);
                 startPreloading();
             };
             probe2.onerror = () => {
-                totalFrames = 142;
-                getFramePath = (i) => `${BASE_DIR}ezgif-frame-${i}.jpg`;
-                initScrollTrigger();
+                totalFrames = 141;
+                getFramePath = (i) => `${BASE_DIR}ezgif-frame-${String(i + 1).padStart(3, '0')}.jpg`;
+                updateCanvasSize();
                 startPreloading();
             };
         };

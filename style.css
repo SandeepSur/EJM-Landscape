@@ -26,9 +26,15 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 40px;
-    position: relative;
-    z-index: 10;
+    padding: 16px 40px;
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #ffffff !important;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+    border-bottom: 1px solid #eef0ea;
+    z-index: 1000;
 }
 
 .logo {
@@ -133,12 +139,14 @@ body {
 .hero-scroll-section {
     position: relative;
     width: 100%;
+    height: calc(100vh + 2600px);
     background-color: #0b1a13;
-    overflow: hidden;
 }
 
 .hero-pin-wrapper {
-    position: relative;
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100vh;
     height: 100dvh;
@@ -205,9 +213,42 @@ body {
     line-height: 1.1;
     color: var(--text-light);
     font-weight: 500;
-    margin-bottom: 35px;
+    margin-bottom: 25px;
     letter-spacing: -1px;
     text-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+}
+
+.hero-hook-copy {
+    font-size: 20px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.92);
+    margin-bottom: 32px;
+    line-height: 1.5;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+}
+
+.hero-supporting-copy {
+    margin-bottom: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.hero-subline-lead {
+    font-size: 20px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.95);
+    line-height: 1.45;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+}
+
+.hero-subline-tag {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--primary-lime);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 .hero-content .highlight {
@@ -1411,14 +1452,13 @@ html {
 
 /* Sticky Navbar Motion */
 .navbar {
-    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
 }
 .navbar.is-scrolled {
-    padding-top: 15px;
-    padding-bottom: 15px;
-    background-color: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+    padding-top: 12px;
+    padding-bottom: 12px;
+    background-color: #ffffff !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
 /* Hero Entrance Animations */
@@ -1564,9 +1604,7 @@ button:active {
         padding: 16px 30px;
         position: sticky;
         top: 0;
-        background: rgba(255, 255, 255, 0.96);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
+        background: #ffffff !important;
         z-index: 1000;
         border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     }
@@ -1686,6 +1724,9 @@ button:active {
     .about-section, .services-section, .why-section, .projects-section, .contact-section, .google-reviews-section {
         padding: 55px 20px;
     }
+    .hero-scroll-section {
+        height: calc(100vh + 1800px);
+    }
     .hero-scroll-indicator {
         bottom: 85px;
     }
@@ -1697,7 +1738,17 @@ button:active {
     .hero-content h1 {
         font-size: clamp(30px, 8vw, 42px);
         line-height: 1.18;
-        margin-bottom: 25px;
+        margin-bottom: 20px;
+    }
+    .hero-hook-copy,
+    .hero-subline-lead {
+        font-size: 16px;
+        margin-bottom: 20px;
+        line-height: 1.45;
+    }
+    .hero-subline-tag {
+        font-size: 13px;
+        letter-spacing: 0.6px;
     }
     .underline {
         bottom: -8px;
