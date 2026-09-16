@@ -828,6 +828,7 @@ body {
     position: relative;
     display: flex;
     align-items: center;
+    width: 100%;
 }
 
 .carousel-track {
@@ -835,9 +836,11 @@ body {
     gap: 30px;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
-    scroll-behavior: smooth;
     padding: 0 60px 20px 60px; /* Left and right padding */
     scrollbar-width: none; /* hide scrollbar firefox */
+    -ms-overflow-style: none;
+    cursor: grab;
+    -webkit-overflow-scrolling: touch;
 }
 
 .carousel-track::-webkit-scrollbar {
@@ -847,6 +850,8 @@ body {
 .project-card {
     flex: 0 0 450px; /* Fixed width for cards */
     scroll-snap-align: start;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .project-image {
@@ -855,12 +860,16 @@ body {
     border-radius: 20px;
     overflow: hidden;
     margin-bottom: 20px;
+    pointer-events: none;
 }
 
 .project-image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
 }
 
 .project-info h3 {
@@ -882,26 +891,46 @@ body {
     position: absolute;
     top: 150px; /* center of image height */
     transform: translateY(-50%);
-    width: 50px;
-    height: 50px;
+    width: 52px;
+    height: 52px;
     border-radius: 50%;
-    background-color: rgba(210, 214, 203, 0.85); /* grayish button */
-    border: none;
+    background-color: #ffffff;
+    border: 1px solid rgba(17, 60, 39, 0.12);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.14);
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    z-index: 10;
-    backdrop-filter: blur(5px);
-    transition: background-color 0.3s;
+    z-index: 100;
+    pointer-events: auto;
+    transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .carousel-btn:hover {
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: #ffffff;
+    transform: translateY(-50%) scale(1.08);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
 }
 
-.prev-btn { left: 20px; }
-.next-btn { right: 20px; }
+.carousel-btn:active {
+    transform: translateY(-50%) scale(0.92);
+}
+
+.carousel-btn svg {
+    pointer-events: none;
+    transition: transform 0.2s ease;
+}
+
+.prev-btn:hover svg {
+    transform: translateX(-2px);
+}
+
+.next-btn:hover svg {
+    transform: translateX(2px);
+}
+
+.prev-btn { left: 24px; }
+.next-btn { right: 24px; }
 
 /* GOOGLE REVIEWS SECTION */
 .google-reviews-section {
@@ -1151,10 +1180,33 @@ body {
     margin: 40px 0;
 }
 
+/* CONTACT PHONE */
 .contact-phone {
     display: flex;
     align-items: center;
+    margin-top: 5px;
+}
+
+.contact-phone a,
+.contact-phone a:link,
+.contact-phone a:visited {
+    display: inline-flex;
+    align-items: center;
     gap: 15px;
+    text-decoration: none !important;
+    color: #ffffff !important;
+    cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.contact-phone a:hover,
+.contact-phone a:focus,
+.contact-phone a:active {
+    opacity: 0.9;
+    transform: translateX(4px);
+    text-decoration: none !important;
+    color: #ffffff !important;
+    outline: none;
 }
 
 .phone-info {
@@ -1162,15 +1214,45 @@ body {
     flex-direction: column;
 }
 
+.contact-phone .phone-label,
 .phone-label {
-    font-size: 14px;
-    color: #99ab3a;
+    font-size: 13px;
+    font-weight: 700;
+    color: #99ab3a !important;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-decoration: none !important;
     margin-bottom: 2px;
+    display: block;
 }
 
+.contact-phone .phone-number,
 .phone-number {
     font-size: 24px;
     font-weight: 600;
+    color: #ffffff !important;
+    text-decoration: none !important;
+    display: block;
+    line-height: 1.2;
+}
+
+/* Footer phone links protection */
+.footer-phone a,
+.footer-phone a:link,
+.footer-phone a:visited,
+.footer-phone-number a,
+.footer-phone-number a:link,
+.footer-phone-number a:visited {
+    color: #ffffff !important;
+    text-decoration: none !important;
+}
+
+/* Global telephone link reset to prevent default browser blue and underlines */
+a[href^="tel:"],
+a[href^="tel:"]:link,
+a[href^="tel:"]:visited {
+    text-decoration: none !important;
+    color: inherit;
 }
 
 .contact-right {
@@ -1922,14 +2004,17 @@ button:active {
         border-radius: 16px;
     }
     .carousel-btn {
-        width: 40px;
-        height: 40px;
+        width: 44px;
+        height: 44px;
         top: 105px;
-        background: rgba(255, 255, 255, 0.92);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        background: #ffffff;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.16);
+        border: 1px solid rgba(17, 60, 39, 0.12);
+        z-index: 100;
+        pointer-events: auto;
     }
-    .prev-btn { left: 8px; }
-    .next-btn { right: 8px; }
+    .prev-btn { left: 10px; }
+    .next-btn { right: 10px; }
 
     /* Google Reviews */
     .gr-header {

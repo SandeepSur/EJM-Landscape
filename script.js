@@ -348,22 +348,103 @@ document.addEventListener("DOMContentLoaded", () => {
     const nextBtn = document.getElementById("next-btn");
 
     if (track && prevBtn && nextBtn) {
-        const getScrollAmount = () => {
-            const firstCard = track.querySelector(".project-card");
-            if (firstCard) {
-                const style = window.getComputedStyle(track);
-                const gap = parseInt(style.gap) || 20;
-                return firstCard.offsetWidth + gap;
-            }
-            return 320;
+        const cards = Array.from(track.querySelectorAll(".project-card"));
+        let snapTimeout = null;
+
+        const getPaddingLeft = () => {
+            return parseInt(window.getComputedStyle(track).paddingLeft) || 0;
         };
 
-        prevBtn.addEventListener("click", () => {
-            track.scrollBy({ left: -getScrollAmount(), behavior: "smooth" });
+        const getCurrentIndex = () => {
+            const currentScroll = track.scrollLeft;
+            const padLeft = getPaddingLeft();
+            let closestIdx = 0;
+            let minDiff = Infinity;
+            cards.forEach((card, i) => {
+                const targetPos = Math.max(0, card.offsetLeft - padLeft);
+                const diff = Math.abs(currentScroll - targetPos);
+                if (diff < minDiff) {
+                    minDiff = diff;
+                    closestIdx = i;
+                }
+            });
+            return closestIdx;
+        };
+
+        const scrollToCard = (index) => {
+            if (!cards[index]) return;
+            const padLeft = getPaddingLeft();
+            const targetLeft = Math.max(0, cards[index].offsetLeft - padLeft);
+
+            // Temporarily disable scroll-snap during smooth scroll so browser doesn't cancel it
+            track.style.scrollSnapType = 'none';
+            track.scrollTo({
+                left: targetLeft,
+                behavior: 'smooth'
+            });
+
+            clearTimeout(snapTimeout);
+            snapTimeout = setTimeout(() => {
+                track.style.scrollSnapType = '';
+            }, 550);
+        };
+
+        prevBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const currentIdx = getCurrentIndex();
+            // If at first card or scrolled near beginning, wrap to the last card; otherwise move left
+            const targetIdx = currentIdx <= 0 ? cards.length - 1 : currentIdx - 1;
+            scrollToCard(targetIdx);
         });
 
-        nextBtn.addEventListener("click", () => {
-            track.scrollBy({ left: getScrollAmount(), behavior: "smooth" });
+        nextBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const currentIdx = getCurrentIndex();
+            // If at last card or scrolled near end, wrap to the first card; otherwise move right
+            const maxScroll = track.scrollWidth - track.clientWidth - 15;
+            const targetIdx = (currentIdx >= cards.length - 1 || track.scrollLeft >= maxScroll) ? 0 : currentIdx + 1;
+            scrollToCard(targetIdx);
+        });
+
+        // Mouse drag-to-scroll support for desktop
+        let isDown = false;
+        let startX = 0;
+        let scrollStart = 0;
+
+        track.addEventListener("mousedown", (e) => {
+            isDown = true;
+            track.style.scrollSnapType = 'none';
+            track.style.cursor = 'grabbing';
+            startX = e.pageX - track.offsetLeft;
+            scrollStart = track.scrollLeft;
+        });
+
+        window.addEventListener("mouseup", () => {
+            if (!isDown) return;
+            isDown = false;
+            track.style.cursor = '';
+            setTimeout(() => {
+                track.style.scrollSnapType = '';
+            }, 150);
+        });
+
+        track.addEventListener("mouseleave", () => {
+            if (!isDown) return;
+            isDown = false;
+            track.style.cursor = '';
+            setTimeout(() => {
+                track.style.scrollSnapType = '';
+            }, 150);
+        });
+
+        track.addEventListener("mousemove", (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - track.offsetLeft;
+            const walk = (x - startX) * 1.4;
+            track.scrollLeft = scrollStart - walk;
         });
     }
 
